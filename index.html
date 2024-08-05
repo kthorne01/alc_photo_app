@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Photo Gallery</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f0f0;
+            overflow: auto; /* Ensure the body can scroll */
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        }
+        .gallery img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .carousel-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .carousel-wrapper {
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+        }
+        .carousel {
+            width: 100%;
+            position: relative;
+        }
+        .carousel .slick-slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .carousel img {
+            width: 100%;
+            max-height: 70vh;
+            cursor: pointer;
+            transform-origin: center center;
+            transition: transform 0.3s ease;
+        }
+        .carousel label {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #fff;
+        }
+        .slick-prev, .slick-next {
+            font-size: 2em;
+            color: #fff;
+        }
+        .close-carousel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            color: #fff;
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            .gallery img {
+                width: 80px;
+                height: 80px;
+            }
+            .carousel img {
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="gallery">
+    <!-- Thumbnails will be inserted here by JavaScript -->
+</div>
+
+<div class="carousel-container">
+    <span class="close-carousel">&times;</span>
+    <div class="carousel-wrapper">
+        <div class="carousel">
+            <!-- Images will be inserted here by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+<script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+<script>
+    const photos = [
+        // Paste the contents of formatted_urls.txt here
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A1.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A10.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A100.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A101.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A102.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A103.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A104.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A105.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A106.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A107.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A108.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A109.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A11.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A110.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A111.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A112.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A113.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A114.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A115.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A116.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A117.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A118.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A119.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A12.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A120.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A121.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A122.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A123.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A124.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A125.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A127.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A128.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A129.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A13.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A130.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A131.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A132.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A133.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A134.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A135.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A136.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A137.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A138.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A139.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A14.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A140.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A141.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A142.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A143.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A144.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A145.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A146.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A147.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A148.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A149.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A15.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A150.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A151.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A152.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A153.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A154.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A155.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A156.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A157.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A158.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A159.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A16.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A160.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A161.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A162.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A163.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A164.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A165.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A166.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A167.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A168.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A169.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A17.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A170.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A171.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A172.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A173.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A174.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A175.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A176.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A177.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A178.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A179.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A18.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A180.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A181.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A19.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A2.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A20.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A21.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A22.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A23.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A24.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A25.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A26.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A27.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A28.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A29.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A3.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A30.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A31.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A32.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A33.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A34.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A35.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A36.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A37.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A38.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A39.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A4.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A40.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A41.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A42.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A43.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A44.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A45.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A46.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A47.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A48.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A49.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A5.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A50.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A51.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A52.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A53.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A54.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A55.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A56.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A57.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A58.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A59.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A6.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A60.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A61.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A62.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A63.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A64.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A65.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A66.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A67.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A68.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A69.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A7.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A70.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A71.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A72.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A73.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A74.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A75.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A76.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A77.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A8.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A88.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A89.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A9.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A90.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A91.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A92.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A93.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A94.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A95.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A96.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A97.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A98.JPG",
+        "https://alc-convocation-photos-2024.s3.amazonaws.com/Photographer_Convocation_Pics_2024/A99.JPG"
+    ];
+
+    const gallery = document.querySelector('.gallery');
+    const carouselContainer = document.querySelector('.carousel-container');
+    const carousel = document.querySelector('.carousel');
+
+    // Add thumbnails to gallery
+    photos.forEach((url, index) => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = url.split('/').pop();
+        img.dataset.index = index;
+        gallery.appendChild(img);
+    });
+
+    // Add images to carousel
+    photos.forEach(url => {
+        const photoDiv = document.createElement('div');
+
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = url.split('/').pop();
+
+        const label = document.createElement('label');
+        label.textContent = img.alt;
+
+        photoDiv.appendChild(img);
+        photoDiv.appendChild(label);
+
+        carousel.appendChild(photoDiv);
+    });
+
+    // Initialize Slick carousel
+    $(document).ready(function(){
+        $('.carousel').slick({
+            infinite: true,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            dots: false, // Disable dots
+            arrows: true,
+            prevArrow: '<button type="button" class="slick-prev">&larr;</button>',
+            nextArrow: '<button type="button" class="slick-next">&rarr;</button>',
+            swipe: true,
+            touchMove: true,
+        });
+
+        // Reset zoom on slide change
+        $('.carousel').on('beforeChange', function(event, slick, currentSlide, nextSlide){
+            const currentImage = document.querySelector('.carousel .slick-active img');
+            currentImage.style.transform = 'scale(1)';
+        });
+    });
+
+    // Open carousel on thumbnail click
+    gallery.addEventListener('click', event => {
+        if (event.target.tagName === 'IMG') {
+            const index = event.target.dataset.index;
+            $('.carousel').slick('slickGoTo', index);
+            carouselContainer.style.display = 'flex';
+        }
+    });
+
+    // Close carousel on click
+    document.querySelector('.close-carousel').addEventListener('click', () => {
+        carouselContainer.style.display = 'none';
+    });
+
+    // Pinch-to-zoom functionality
+    const hammertime = new Hammer.Manager(document.querySelector('.carousel'), {
+        recognizers: [
+            [Hammer.Pinch, { enable: true }],
+        ],
+    });
+
+    let currentScale = 1;
+
+    hammertime.on('pinchmove', (ev) => {
+        const currentImage = document.querySelector('.carousel .slick-active img');
+        currentScale = ev.scale;
+        currentImage.style.transform = `scale(${currentScale})`;
+    });
+
+    hammertime.on('pinchend', () => {
+        const currentImage = document.querySelector('.carousel .slick-active img');
+        if (currentScale < 1) {
+            currentScale = 1;
+            currentImage.style.transform = `scale(${currentScale})`;
+        }
+    });
+</script>
+
+</body>
+</html>
